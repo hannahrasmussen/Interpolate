@@ -33,18 +33,14 @@ def lin_int(X,x,y): #x is an array of 6 x values, y is an array of 6 y values th
     
     return P05
 
-#################
-##  Only use this if the x-values are boxsize * i
-@nb.jit(nopython=True)
-def interp(X,boxsize,y_full):
-    x_full = np.zeros(len(y_full))
-    for i in range(len(y_full)):
-        x_full[i] = boxsize * i    
-    j = int(X / boxsize)
     
-    if j >= len(x_full):
-        print("Error:  extrapolation required")
+@nb.jit(nopython=True)
+def interp(X,x_full,y_full):
+    if X > x_full[-1]:
+        print("Error:  extrapolation required!")
         return 0
+    
+    j = np.where(x_full < X)[0][-1]
     if j < 3:
         return lin_int(X, x_full[:6], y_full[:6])
     elif (j > len(x_full) - 4):
@@ -53,15 +49,13 @@ def interp(X,boxsize,y_full):
         return lin_int(X, x_full[j-3:j+3], y_full[j-3:j+3])
     
 @nb.jit(nopython=True)
-def interp_log(X,boxsize,y_full):
-    return np.exp(interp(X,boxsize,np.log(y_full)))
+def interp_log(X,p_array,y_full):
+    return np.exp(interp(X,p_array,np.log(y_full)))
 
 @nb.jit(nopython=True)
 def linear_extrap(X,x,y):    
     return y[0] + (y[1] - y[0])/(x[1] - x[0]) * (X - x[0])
 
-#################
-## Note, x and y need to be numpy arrays, should be of length 2
 @nb.jit(nopython=True)
 def log_linear_extrap(X,x,y):
     return np.exp(linear_extrap(X,x,np.log(y)))
