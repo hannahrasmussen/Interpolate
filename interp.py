@@ -2,8 +2,8 @@ import numba as nb
 import numpy as np
 
 @nb.jit(nopython=True)
-def lin_int(X,x,y): #x is an array of 6 x values, y is an array of 6 y values that correspond w/ x, X is the
-                    #x value we wish to find a corresponding y value for via interpolation
+def lin_int(X,x,y): 
+    
     P00 = y[0]
     P11 = y[1]
     P22 = y[2]
