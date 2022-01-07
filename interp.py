@@ -2,6 +2,16 @@ import numba as nb
 import numpy as np
 
 @nb.jit(nopython=True)
+def log_fix(y):
+    log_y = np.zeros(len(y))
+    for i in range(len(y)):
+        if (y[i]==0):
+            log_y[i] = -200
+        else:
+            log_y[i] = np.log(y[i])
+    return log_y
+
+@nb.jit(nopython=True)
 def lin_int(X,x,y): 
     
     P00 = y[0]
@@ -32,7 +42,6 @@ def lin_int(X,x,y):
     P05 = ((X-x[5])*P04 - (X-x[0])*P15)/(x[0]-x[5])
     
     return P05
-
     
 @nb.jit(nopython=True)
 def interp(X,x_full,y_full):
@@ -50,7 +59,8 @@ def interp(X,x_full,y_full):
     
 @nb.jit(nopython=True)
 def interp_log(X,p_array,y_full):
-    return np.exp(interp(X,p_array,np.log(y_full)))
+    log_y = log_fix(y_full)
+    return np.exp(interp(X,p_array,log_y))
 
 @nb.jit(nopython=True)
 def linear_extrap(X,x,y):    
@@ -58,4 +68,5 @@ def linear_extrap(X,x,y):
 
 @nb.jit(nopython=True)
 def log_linear_extrap(X,x,y):
-    return np.exp(linear_extrap(X,x,np.log(y)))
+    log_y = log_fix(y)
+    return np.exp(linear_extrap(X,x,log_y))
